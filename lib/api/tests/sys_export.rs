@@ -127,7 +127,7 @@ mod sys {
 
             let instance = Instance::new(
                 &module,
-                &imports! {
+                imports! {
                     "env" => {
                         "host_fn" => Function::new_native_with_env(&store, env, host_fn)
                     }
@@ -171,7 +171,7 @@ mod sys {
 
             let instance = Instance::new(
                 &module,
-                &imports! {
+                imports! {
                     "env" => {
                         "host_fn" => Function::new_native_with_env(&store, env, host_fn)
                     }
@@ -215,7 +215,7 @@ mod sys {
 
             let instance = Instance::new(
                 &module,
-                &imports! {
+                imports! {
                     "env" => {
                         "host_fn" => Function::new_native_with_env(&store, env, host_fn)
                     }
@@ -259,7 +259,7 @@ mod sys {
 
             let instance = Instance::new(
                 &module,
-                &imports! {
+                imports! {
                     "env" => {
                         "host_fn" => Function::new_native_with_env(&store, env, host_fn)
                     }
@@ -312,7 +312,7 @@ mod sys {
 
             let instance = Instance::new(
                 &module,
-                &imports! {
+                imports! {
                     "env" => {
                         "host_fn" => Function::new_native_with_env(&store, env, host_fn)
                     }

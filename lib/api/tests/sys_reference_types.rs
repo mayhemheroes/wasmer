@@ -29,7 +29,7 @@ mod sys {
             },
         };
 
-        let instance = Instance::new(&module, &imports)?;
+        let instance = Instance::new(&module, imports)?;
 
         let f: &Function = instance.exports.get_function("run")?;
         let results = f.call(&[]).unwrap();
@@ -101,7 +101,7 @@ mod sys {
             },
         };
 
-        let instance = Instance::new(&module, &imports)?;
+        let instance = Instance::new(&module, imports)?;
         {
             fn sum(a: i32, b: i32) -> i32 {
                 a + b
@@ -174,7 +174,7 @@ mod sys {
             },
         };
 
-        let instance = Instance::new(&module, &imports)?;
+        let instance = Instance::new(&module, imports)?;
         for run in &["run", "run_native"] {
             let f: &Function = instance.exports.get_function(run)?;
             let results = f.call(&[]).unwrap();
@@ -222,7 +222,7 @@ mod sys {
           (drop (local.get $er)))
 )"#;
         let module = Module::new(&store, wat)?;
-        let instance = Instance::new(&module, &imports! {})?;
+        let instance = Instance::new(&module, imports! {})?;
         let f: NativeFunc<ExternRef, ()> = instance.exports.get_native_function("drop")?;
 
         let er = ExternRef::new(3u32);
@@ -246,7 +246,7 @@ mod sys {
           (i32.const 73))
 )"#;
         let module = Module::new(&store, wat)?;
-        let instance = Instance::new(&module, &imports! {})?;
+        let instance = Instance::new(&module, imports! {})?;
         {
             let er_global: &Global = instance.exports.get_global("er_global")?;
 
@@ -316,7 +316,7 @@ mod sys {
           (local.get $er))
 )"#;
         let module = Module::new(&store, wat)?;
-        let instance = Instance::new(&module, &imports! {})?;
+        let instance = Instance::new(&module, imports! {})?;
 
         let f: NativeFunc<(ExternRef, i32), ExternRef> =
             instance.exports.get_native_function("insert_into_table")?;
@@ -354,7 +354,7 @@ mod sys {
           (global.get $global))
 )"#;
         let module = Module::new(&store, wat)?;
-        let instance = Instance::new(&module, &imports! {})?;
+        let instance = Instance::new(&module, imports! {})?;
 
         let global: &Global = instance.exports.get_global("global")?;
         {
@@ -385,7 +385,7 @@ mod sys {
           (unreachable))
 )"#;
         let module = Module::new(&store, wat)?;
-        let instance = Instance::new(&module, &imports! {})?;
+        let instance = Instance::new(&module, imports! {})?;
 
         let pass_extern_ref: NativeFunc<ExternRef, ()> =
             instance.exports.get_native_function("pass_extern_ref")?;
@@ -415,7 +415,7 @@ mod sys {
           (table.copy $table2 $table1 (i32.const 0) (i32.const 0) (i32.const 4)))
 )"#;
         let module = Module::new(&store, wat)?;
-        let instance = Instance::new(&module, &imports! {})?;
+        let instance = Instance::new(&module, imports! {})?;
 
         let grow_table_with_ref: NativeFunc<(ExternRef, i32), i32> = instance
             .exports

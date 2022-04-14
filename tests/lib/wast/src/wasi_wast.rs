@@ -2,7 +2,7 @@ use anyhow::Context;
 use std::fs::{read_dir, File, OpenOptions, ReadDir};
 use std::io::{self, Read, Seek, Write};
 use std::path::PathBuf;
-use wasmer::{ImportObject, Instance, Module, Store};
+use wasmer::{Imports, Instance, Module, Store};
 use wasmer_vfs::{host_fs, mem_fs, FileSystem};
 use wasmer_wasi::types::{__wasi_filesize_t, __wasi_timestamp_t};
 use wasmer_wasi::{
@@ -98,7 +98,7 @@ impl<'a> WasiTest<'a> {
         let module = Module::new(&store, &wasm_bytes)?;
         let (env, _tempdirs) = self.create_wasi_env(filesystem_kind)?;
         let imports = self.get_imports(store, &module, env.clone())?;
-        let instance = Instance::new(&module, &imports)?;
+        let instance = Instance::new(&module, imports)?;
 
         let start = instance.exports.get_function("_start")?;
 
@@ -236,12 +236,7 @@ impl<'a> WasiTest<'a> {
 
     /// Get the correct WASI import object for the given module and set it up with the
     /// [`WasiEnv`].
-    fn get_imports(
-        &self,
-        store: &Store,
-        module: &Module,
-        env: WasiEnv,
-    ) -> anyhow::Result<ImportObject> {
+    fn get_imports(&self, store: &Store, module: &Module, env: WasiEnv) -> anyhow::Result<Imports> {
         let version = self.get_version(module)?;
         Ok(generate_import_object_from_env(store, env, version))
     }

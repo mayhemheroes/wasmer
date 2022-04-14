@@ -247,7 +247,7 @@ mod js {
     //             }),
     //         }
     //     };
-    //     let instance = Instance::new(&module, &imports).unwrap();
+    //     let instance = Instance::new(&module, imports).unwrap();
 
     //     let f1: NativeFunc<(), ()> = instance
     //         .exports

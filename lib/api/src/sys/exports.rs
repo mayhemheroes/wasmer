@@ -1,5 +1,4 @@
 use crate::sys::externals::{Extern, Function, Global, Memory, Table};
-use crate::sys::import_object::LikeNamespace;
 use crate::sys::native::NativeFunc;
 use crate::sys::WasmTypeList;
 use indexmap::IndexMap;
@@ -27,7 +26,7 @@ use wasmer_engine::Export;
 /// # "#.as_bytes()).unwrap();
 /// # let module = Module::new(&store, wasm_bytes).unwrap();
 /// # let import_object = imports! {};
-/// # let instance = Instance::new(&module, &import_object).unwrap();
+/// # let instance = Instance::new(&module, import_object).unwrap();
 /// #
 /// // This results with an error: `ExportError::IncompatibleType`.
 /// let export = instance.exports.get_function("glob").unwrap();
@@ -41,7 +40,7 @@ use wasmer_engine::Export;
 /// # let wasm_bytes = wat2wasm("(module)".as_bytes()).unwrap();
 /// # let module = Module::new(&store, wasm_bytes).unwrap();
 /// # let import_object = imports! {};
-/// # let instance = Instance::new(&module, &import_object).unwrap();
+/// # let instance = Instance::new(&module, import_object).unwrap();
 /// #
 /// // This results with an error: `ExportError::Missing`.
 /// let export = instance.exports.get_function("unknown").unwrap();
@@ -195,6 +194,32 @@ impl Exports {
             iter: self.map.iter(),
         }
     }
+
+    /// safa
+    pub fn get_namespace_export(&self, name: &str) -> Option<Export> {
+        self.map.get(name).map(|is_export| is_export.to_export())
+    }
+
+    /// safa
+    pub fn get_namespace_externs(&self) -> Vec<(String, Extern)> {
+        self.map
+            .iter()
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect()
+    }
+
+    /// safa
+    pub fn get_namespace_exports(&self) -> Vec<(String, Export)> {
+        self.map
+            .iter()
+            .map(|(k, v)| (k.clone(), v.to_export()))
+            .collect()
+    }
+
+    /// safa
+    pub fn as_exports(&self) -> Option<Exports> {
+        Some(self.clone())
+    }
 }
 
 impl fmt::Debug for Exports {
@@ -276,20 +301,21 @@ impl FromIterator<(String, Extern)> for Exports {
     }
 }
 
-impl LikeNamespace for Exports {
-    fn get_namespace_export(&self, name: &str) -> Option<Export> {
-        self.map.get(name).map(|is_export| is_export.to_export())
-    }
+impl IntoIterator for Exports {
+    type IntoIter = std::vec::IntoIter<(String, Extern)>;
+    type Item = (String, Extern);
 
-    fn get_namespace_exports(&self) -> Vec<(String, Export)> {
-        self.map
-            .iter()
-            .map(|(k, v)| (k.clone(), v.to_export()))
-            .collect()
+    fn into_iter(self) -> Self::IntoIter {
+        self.get_namespace_externs().into_iter()
     }
+}
 
-    fn as_exports(&self) -> Option<Exports> {
-        Some(self.clone())
+impl IntoIterator for &Exports {
+    type IntoIter = std::vec::IntoIter<(String, Extern)>;
+    type Item = (String, Extern);
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.get_namespace_externs().into_iter()
     }
 }
 

@@ -103,7 +103,7 @@ fn middleware_basic(mut config: crate::Config) -> Result<()> {
 
     let import_object = imports! {};
 
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     let f: NativeFunc<(i32, i32), i32> = instance.exports.get_native_function("add")?;
     let result = f.call(4, 6)?;
@@ -126,7 +126,7 @@ fn middleware_one_to_multi(mut config: crate::Config) -> Result<()> {
 
     let import_object = imports! {};
 
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     let f: NativeFunc<(i32, i32), i32> = instance.exports.get_native_function("add")?;
     let result = f.call(4, 6)?;
@@ -150,7 +150,7 @@ fn middleware_multi_to_one(mut config: crate::Config) -> Result<()> {
 
     let import_object = imports! {};
 
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     let f: NativeFunc<(i32, i32), i32> = instance.exports.get_native_function("testfunc")?;
     let result = f.call(10, 20)?;
@@ -174,7 +174,7 @@ fn middleware_chain_order_1(mut config: crate::Config) -> Result<()> {
 
     let import_object = imports! {};
 
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     let f: NativeFunc<(i32, i32), i32> = instance.exports.get_native_function("add")?;
     let result = f.call(4, 6)?;
@@ -198,7 +198,7 @@ fn middleware_chain_order_2(mut config: crate::Config) -> Result<()> {
 
     let import_object = imports! {};
 
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     let f: NativeFunc<(i32, i32), i32> = instance.exports.get_native_function("add")?;
     let result = f.call(4, 6)?;

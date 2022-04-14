@@ -18,7 +18,7 @@ fn test_trap_return(config: crate::Config) -> Result<()> {
 
     let instance = Instance::new(
         &module,
-        &imports! {
+        imports! {
             "" => {
                 "hello" => hello_func
             }
@@ -48,7 +48,7 @@ fn test_trap_trace(config: crate::Config) -> Result<()> {
     "#;
 
     let module = Module::new(&store, wat)?;
-    let instance = Instance::new(&module, &imports! {})?;
+    let instance = Instance::new(&module, imports! {})?;
     let run_func = instance
         .exports
         .get_function("run")
@@ -90,7 +90,7 @@ fn test_trap_trace_cb(config: crate::Config) -> Result<()> {
     let module = Module::new(&store, wat)?;
     let instance = Instance::new(
         &module,
-        &imports! {
+        imports! {
             "" => {
                 "throw" => fn_func
             }
@@ -127,7 +127,7 @@ fn test_trap_stack_overflow(config: crate::Config) -> Result<()> {
     "#;
 
     let module = Module::new(&store, wat)?;
-    let instance = Instance::new(&module, &imports! {})?;
+    let instance = Instance::new(&module, imports! {})?;
     let run_func = instance
         .exports
         .get_function("run")
@@ -157,7 +157,7 @@ fn trap_display_pretty(config: crate::Config) -> Result<()> {
     "#;
 
     let module = Module::new(&store, wat)?;
-    let instance = Instance::new(&module, &imports! {})?;
+    let instance = Instance::new(&module, imports! {})?;
     let run_func = instance
         .exports
         .get_function("bar")
@@ -190,7 +190,7 @@ fn trap_display_multi_module(config: crate::Config) -> Result<()> {
     "#;
 
     let module = Module::new(&store, wat)?;
-    let instance = Instance::new(&module, &imports! {})?;
+    let instance = Instance::new(&module, imports! {})?;
     let bar = instance.exports.get_function("bar")?.clone();
 
     let wat = r#"
@@ -203,7 +203,7 @@ fn trap_display_multi_module(config: crate::Config) -> Result<()> {
     let module = Module::new(&store, wat)?;
     let instance = Instance::new(
         &module,
-        &imports! {
+        imports! {
             "" => {
                 "" => bar
             }
@@ -244,7 +244,7 @@ fn trap_start_function_import(config: crate::Config) -> Result<()> {
     let func = Function::new(&store, &sig, |_| Err(RuntimeError::new("user trap")));
     let err = Instance::new(
         &module,
-        &imports! {
+        imports! {
             "" => {
                 "" => func
             }
@@ -283,7 +283,7 @@ fn rust_panic_import(config: crate::Config) -> Result<()> {
     let func = Function::new(&store, &sig, |_| panic!("this is a panic"));
     let instance = Instance::new(
         &module,
-        &imports! {
+        imports! {
             "" => {
                 "foo" => func,
                 "bar" => Function::new_native(&store, || panic!("this is another panic"))
@@ -327,7 +327,7 @@ fn rust_panic_start_function(config: crate::Config) -> Result<()> {
     let err = panic::catch_unwind(AssertUnwindSafe(|| {
         drop(Instance::new(
             &module,
-            &imports! {
+            imports! {
                 "" => {
                     "" => func
                 }
@@ -341,7 +341,7 @@ fn rust_panic_start_function(config: crate::Config) -> Result<()> {
     let err = panic::catch_unwind(AssertUnwindSafe(|| {
         drop(Instance::new(
             &module,
-            &imports! {
+            imports! {
                 "" => {
                     "" => func
                 }
@@ -366,7 +366,7 @@ fn mismatched_arguments(config: crate::Config) -> Result<()> {
     "#;
 
     let module = Module::new(&store, &binary)?;
-    let instance = Instance::new(&module, &imports! {})?;
+    let instance = Instance::new(&module, imports! {})?;
     let func: &Function = instance.exports.get("foo")?;
     assert_eq!(
         func.call(&[]).unwrap_err().message(),
@@ -403,7 +403,7 @@ fn call_signature_mismatch(config: crate::Config) -> Result<()> {
     "#;
 
     let module = Module::new(&store, &binary)?;
-    let err = Instance::new(&module, &imports! {})
+    let err = Instance::new(&module, imports! {})
         .err()
         .expect("expected error");
     assert_eq!(
@@ -431,7 +431,7 @@ fn start_trap_pretty(config: crate::Config) -> Result<()> {
     "#;
 
     let module = Module::new(&store, wat)?;
-    let err = Instance::new(&module, &imports! {})
+    let err = Instance::new(&module, imports! {})
         .err()
         .expect("expected error");
 
@@ -452,7 +452,7 @@ RuntimeError: unreachable
 fn present_after_module_drop(config: crate::Config) -> Result<()> {
     let store = config.store();
     let module = Module::new(&store, r#"(func (export "foo") unreachable)"#)?;
-    let instance = Instance::new(&module, &imports! {})?;
+    let instance = Instance::new(&module, imports! {})?;
     let func: Function = instance.exports.get_function("foo")?.clone();
 
     println!("asserting before we drop modules");

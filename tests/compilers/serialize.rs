@@ -55,7 +55,7 @@ fn test_deserialize(config: crate::Config) -> Result<()> {
     );
     let instance = Instance::new(
         &module,
-        &imports! {
+        imports! {
             "host" => {
                 "sum_part" => Function::new(&store, &func_type, |params| {
                     let param_0: i64 = params[0].unwrap_i32() as i64;

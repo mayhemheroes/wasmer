@@ -80,7 +80,7 @@ impl Instance {
     ///     "var" => Global::new(&store, Value::I32(2))
     ///   }
     /// };
-    /// let instance = Instance::new(&module, &imports)?;
+    /// let instance = Instance::new(&module, imports)?;
     /// # Ok(())
     /// # }
     /// ```

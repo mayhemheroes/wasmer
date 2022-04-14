@@ -50,7 +50,7 @@ fn dynamic_function(config: crate::Config) -> Result<()> {
     static HITS: AtomicUsize = AtomicUsize::new(0);
     Instance::new(
         &module,
-        &imports! {
+        imports! {
             "host" => {
                 "0" => Function::new(&store, FunctionType::new(vec![], vec![]), |_values| {
                     assert_eq!(HITS.fetch_add(1, SeqCst), 0);
@@ -105,7 +105,7 @@ fn dynamic_function_with_env(config: crate::Config) -> Result<()> {
     };
     Instance::new(
         &module,
-        &imports! {
+        imports! {
             "host" => {
                 "0" => Function::new_with_env(&store, FunctionType::new(vec![], vec![]), env.clone(), |env, _values| {
                     assert_eq!(env.fetch_add(1, SeqCst), 0);
@@ -147,7 +147,7 @@ fn static_function(config: crate::Config) -> Result<()> {
     static HITS: AtomicUsize = AtomicUsize::new(0);
     Instance::new(
         &module,
-        &imports! {
+        imports! {
             "host" => {
                 "0" => Function::new_native(&store, || {
                     assert_eq!(HITS.fetch_add(1, SeqCst), 0);
@@ -186,7 +186,7 @@ fn static_function_with_results(config: crate::Config) -> Result<()> {
     static HITS: AtomicUsize = AtomicUsize::new(0);
     Instance::new(
         &module,
-        &imports! {
+        imports! {
             "host" => {
                 "0" => Function::new_native(&store, || {
                     assert_eq!(HITS.fetch_add(1, SeqCst), 0);
@@ -234,7 +234,7 @@ fn static_function_with_env(config: crate::Config) -> Result<()> {
     let env: Env = Env(Arc::new(AtomicUsize::new(0)));
     Instance::new(
         &module,
-        &imports! {
+        imports! {
             "host" => {
                 "0" => Function::new_native_with_env(&store, env.clone(), |env: &Env| {
                     assert_eq!(env.fetch_add(1, SeqCst), 0);
@@ -280,7 +280,7 @@ fn static_function_that_fails(config: crate::Config) -> Result<()> {
 
     let result = Instance::new(
         &module,
-        &imports! {
+        imports! {
             "host" => {
                 "0" => Function::new_native(&store, || -> Result<Infallible, RuntimeError> {
                     Err(RuntimeError::new("oops"))
@@ -332,7 +332,7 @@ fn dynamic_function_with_env_wasmer_env_init_works(config: crate::Config) -> Res
     };
     let instance = Instance::new(
         &module,
-        &imports! {
+        imports! {
             "host" => {
                 "fn" => Function::new_with_env(&store, FunctionType::new(vec![], vec![]), env.clone(), |env, _values| {
                     assert!(env.memory_ref().is_some());
@@ -378,8 +378,8 @@ fn multi_use_host_fn_manages_memory_correctly(config: crate::Config) -> Result<(
             "fn" => Function::new_native_with_env(&store, env.clone(), host_fn),
         },
     };
-    let instance1 = Instance::new(&module, &imports)?;
-    let instance2 = Instance::new(&module, &imports)?;
+    let instance1 = Instance::new(&module, imports.clone())?;
+    let instance2 = Instance::new(&module, imports)?;
     {
         let f1: NativeFunc<(), ()> = instance1.exports.get_native_function("main")?;
         f1.call()?;
@@ -403,7 +403,7 @@ fn instance_local_memory_lifetime(config: crate::Config) -> Result<()> {
     (export "memory" (memory $mem))
 )"#;
         let module = Module::new(&store, wat)?;
-        let instance = Instance::new(&module, &imports! {})?;
+        let instance = Instance::new(&module, imports! {})?;
         instance.exports.get_memory("memory")?.clone()
     };
 
@@ -424,7 +424,7 @@ fn instance_local_memory_lifetime(config: crate::Config) -> Result<()> {
             "memory" => memory,
         },
     };
-    let instance = Instance::new(&module, &imports)?;
+    let instance = Instance::new(&module, imports)?;
     let set_at: NativeFunc<(i32, i32), ()> = instance.exports.get_native_function("set_at")?;
     let get_at: NativeFunc<i32, i32> = instance.exports.get_native_function("get_at")?;
     set_at.call(200, 123)?;

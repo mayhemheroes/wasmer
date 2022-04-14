@@ -17,7 +17,7 @@ use std::convert::TryFrom;
 use std::ffi::CStr;
 use std::os::raw::c_char;
 use std::slice;
-use wasmer_api::{Extern, NamedResolver};
+use wasmer_api::Extern;
 use wasmer_wasi::{
     generate_import_object_from_env, get_wasi_version, WasiEnv, WasiFile, WasiState,
     WasiStateBuilder, WasiVersion,
@@ -352,7 +352,7 @@ fn wasi_get_imports_inner(
         .imports()
         .map(|import_type| {
             let export = import_object
-                .resolve_by_name(import_type.module(), import_type.name())
+                .get_export(import_type.module(), import_type.name())
                 .ok_or_else(|| {
                     format!(
                         "Failed to resolve import \"{}\" \"{}\"",

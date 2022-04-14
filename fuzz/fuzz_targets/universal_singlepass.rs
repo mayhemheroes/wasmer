@@ -52,7 +52,7 @@ fuzz_target!(|module: WasmSmithModule| {
             panic!("{}", e);
         }
     };
-    match Instance::new(&module, &imports! {}) {
+    match Instance::new(&module, imports! {}) {
         Ok(_) => {}
         Err(e) => {
             let error_message = format!("{}", e);

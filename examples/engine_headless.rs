@@ -133,7 +133,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         println!("Instantiating module...");
         // Let's instantiate the Wasm module.
-        let instance = Instance::new(&module, &import_object)?;
+        let instance = Instance::new(&module, import_object)?;
 
         println!("Calling `sum` function...");
         // The Wasm module exports a function called `sum`.

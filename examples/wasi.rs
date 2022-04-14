@@ -49,7 +49,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Then, we get the import object related to our WASI
     // and attach it to the Wasm instance.
     let import_object = wasi_env.import_object(&module)?;
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     println!("Call WASI `_start` function...");
     // And we just call the `_start` function!

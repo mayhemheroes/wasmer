@@ -113,7 +113,7 @@ impl Run {
                 let mut em_env = EmEnv::new(&emscripten_globals.data, Default::default());
                 let import_object =
                     generate_emscripten_env(module.store(), &mut emscripten_globals, &mut em_env);
-                let mut instance = match Instance::new(&module, &import_object) {
+                let mut instance = match Instance::new(&module, import_object) {
                     Ok(instance) => instance,
                     Err(e) => {
                         let err: Result<(), _> = Err(e);
@@ -183,11 +183,11 @@ impl Run {
                         .with_context(|| "failed to instantiate WASI module")?
                 }
                 // not WASI
-                _ => Instance::new(&module, &imports! {})?,
+                _ => Instance::new(&module, imports! {})?,
             }
         };
         #[cfg(not(feature = "wasi"))]
-        let instance = Instance::new(&module, &imports! {})?;
+        let instance = Instance::new(&module, imports! {})?;
 
         // If this module exports an _initialize function, run that first.
         if let Ok(initialize) = instance.exports.get_function("_initialize") {
@@ -199,7 +199,7 @@ impl Run {
         // Do we want to invoke a function?
         if let Some(ref invoke) = self.invoke {
             let imports = imports! {};
-            let instance = Instance::new(&module, &imports)?;
+            let instance = Instance::new(&module, imports)?;
             let result = self.invoke_function(&instance, &invoke, &self.args)?;
             println!(
                 "{}",

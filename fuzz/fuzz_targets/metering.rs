@@ -58,7 +58,7 @@ fuzz_target!(|module: WasmSmithModule| {
     compiler.push_middleware(metering);
     let store = Store::new(&Universal::new(compiler).engine());
     let module = Module::new(&store, &wasm_bytes).unwrap();
-    match Instance::new(&module, &imports! {}) {
+    match Instance::new(&module, imports! {}) {
         Ok(_) => {}
         Err(e) => {
             let error_message = format!("{}", e);

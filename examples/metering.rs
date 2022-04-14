@@ -81,7 +81,7 @@ fn main() -> anyhow::Result<()> {
 
     println!("Instantiating module...");
     // Let's instantiate the Wasm module.
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     // We now have an instance ready to be used.
     //

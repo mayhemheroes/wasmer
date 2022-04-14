@@ -226,7 +226,7 @@ mod sys {
                 }),
             }
         };
-        let instance = Instance::new(&module, &imports)?;
+        let instance = Instance::new(&module, imports)?;
 
         let f1: NativeFunc<(), ()> = instance.exports.get_native_function("call_host_func1")?;
         let f2: NativeFunc<(), ()> = instance.exports.get_native_function("call_host_func2")?;

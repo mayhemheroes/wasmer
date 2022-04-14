@@ -45,7 +45,7 @@ fn main() -> anyhow::Result<()> {
     // Finally, let's instantiate the module, and execute something
     // :-).
     let import_object = imports! {};
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
     let swap = instance.exports.get_function("swap")?;
 
     let results = swap.call(&[Value::I32(1), Value::I64(2)])?;

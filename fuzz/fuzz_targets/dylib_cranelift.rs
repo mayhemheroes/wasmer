@@ -49,7 +49,7 @@ fuzz_target!(|module: WasmSmithModule| {
     let engine = Dylib::headless().engine();
     let store = Store::new(&engine);
     let module = unsafe { Module::deserialize(&store, serialized.as_slice()) }.unwrap();
-    match Instance::new(&module, &imports! {}) {
+    match Instance::new(&module, imports! {}) {
         Ok(_) => {}
         Err(e) => {
             let error_message = format!("{}", e);

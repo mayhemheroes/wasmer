@@ -58,7 +58,7 @@
 //!     let module = Module::new(&store, &module_wat)?;
 //!     // The module doesn't import anything, so we create an empty import object.
 //!     let import_object = imports! {};
-//!     let instance = Instance::new(&module, &import_object)?;
+//!     let instance = Instance::new(&module, import_object)?;
 //!
 //!     let add_one = instance.exports.get_function("add_one")?;
 //!     let result = add_one.call(&[Value::I32(42)])?;
@@ -157,8 +157,8 @@
 //! [`imports`] macro:
 //!
 //! ```
-//! # use wasmer::{imports, Function, Memory, MemoryType, Store, ImportObject};
-//! # fn imports_example(store: &Store) -> ImportObject {
+//! # use wasmer::{imports, Function, Memory, MemoryType, Store, Imports};
+//! # fn imports_example(store: &Store) -> Imports {
 //! let memory = Memory::new(&store, MemoryType::new(1, None, false)).unwrap();
 //! imports! {
 //!     "env" => {
@@ -412,7 +412,7 @@
 //!     let module = Module::new(&store, &module_wat).unwrap();
 //!     // The module doesn't import anything, so we create an empty import object.
 //!     let import_object = imports! {};
-//!     let instance = Instance::new(&module, &import_object).unwrap();
+//!     let instance = Instance::new(&module, import_object).unwrap();
 //!
 //!     let add_one = instance.exports.get_function("add_one").unwrap();
 //!     let result = add_one.call(&[Value::I32(42)]).unwrap();

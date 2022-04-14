@@ -448,7 +448,7 @@ impl Function {
     /// # "#.as_bytes()).unwrap();
     /// # let module = Module::new(&store, wasm_bytes).unwrap();
     /// # let import_object = imports! {};
-    /// # let instance = Instance::new(&module, &import_object).unwrap();
+    /// # let instance = Instance::new(&module, import_object).unwrap();
     /// #
     /// let sum = instance.exports.get_function("sum").unwrap();
     ///
@@ -507,7 +507,7 @@ impl Function {
     /// # "#.as_bytes()).unwrap();
     /// # let module = Module::new(&store, wasm_bytes).unwrap();
     /// # let import_object = imports! {};
-    /// # let instance = Instance::new(&module, &import_object).unwrap();
+    /// # let instance = Instance::new(&module, import_object).unwrap();
     /// #
     /// let sum = instance.exports.get_function("sum").unwrap();
     /// let sum_native = sum.native::<(i32, i32), i32>().unwrap();
@@ -533,7 +533,7 @@ impl Function {
     /// # "#.as_bytes()).unwrap();
     /// # let module = Module::new(&store, wasm_bytes).unwrap();
     /// # let import_object = imports! {};
-    /// # let instance = Instance::new(&module, &import_object).unwrap();
+    /// # let instance = Instance::new(&module, import_object).unwrap();
     /// #
     /// let sum = instance.exports.get_function("sum").unwrap();
     ///
@@ -557,7 +557,7 @@ impl Function {
     /// # "#.as_bytes()).unwrap();
     /// # let module = Module::new(&store, wasm_bytes).unwrap();
     /// # let import_object = imports! {};
-    /// # let instance = Instance::new(&module, &import_object).unwrap();
+    /// # let instance = Instance::new(&module, import_object).unwrap();
     /// #
     /// let sum = instance.exports.get_function("sum").unwrap();
     ///

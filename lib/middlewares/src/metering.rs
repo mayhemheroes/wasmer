@@ -396,7 +396,7 @@ mod tests {
         let module = Module::new(&store, bytecode()).unwrap();
 
         // Instantiate
-        let instance = Instance::new(&module, &imports! {}).unwrap();
+        let instance = Instance::new(&module, imports! {}).unwrap();
         assert_eq!(
             get_remaining_points(&instance),
             MeteringPoints::Remaining(10)
@@ -441,7 +441,7 @@ mod tests {
         let module = Module::new(&store, bytecode()).unwrap();
 
         // Instantiate
-        let instance = Instance::new(&module, &imports! {}).unwrap();
+        let instance = Instance::new(&module, imports! {}).unwrap();
         assert_eq!(
             get_remaining_points(&instance),
             MeteringPoints::Remaining(10)

@@ -23,7 +23,7 @@ fn run_add_with_limit(mut config: crate::Config, limit: u64) -> Result<()> {
 
     let import_object = imports! {};
 
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     let f: NativeFunc<(i32, i32), i32> = instance.exports.get_native_function("add")?;
     f.call(4, 6)?;
@@ -54,7 +54,7 @@ fn run_loop(mut config: crate::Config, limit: u64, iter_count: i32) -> Result<()
 
     let import_object = imports! {};
 
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     let f: NativeFunc<i32, ()> = instance.exports.get_native_function("test")?;
     f.call(iter_count)?;
@@ -157,7 +157,7 @@ fn complex_loop(mut config: crate::Config) -> Result<()> {
 
     let import_object = imports! {};
 
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     let f: NativeFunc<(i32, i32), i32> = instance.exports.get_native_function("add_to")?;
 

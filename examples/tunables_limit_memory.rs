@@ -161,7 +161,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let import_object = imports! {};
 
     // Now at this point, our custom tunables are used
-    let instance = Instance::new(&module, &import_object)?;
+    let instance = Instance::new(&module, import_object)?;
 
     // Check what happened
     let mut memories: Vec<Memory> = instance
