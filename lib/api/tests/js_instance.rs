@@ -24,7 +24,7 @@ mod js {
             .unwrap();
 
         let import_object = imports! {};
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         let memory = instance.exports.get_memory("mem").unwrap();
         assert_eq!(memory.ty(), MemoryType::new(Pages(1), None, false));
@@ -62,7 +62,7 @@ mod js {
             .unwrap();
 
         let import_object = imports! {};
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         let get_magic = instance.exports.get_function("get_magic").unwrap();
         assert_eq!(
@@ -103,7 +103,7 @@ mod js {
             .unwrap();
 
         let imported_signature = FunctionType::new(vec![Type::I32], vec![Type::I32]);
-        let imported = Function::new(&store, &imported_signature, |args| {
+        let imported = Function::new(&store, imported_signature, |args| {
             println!("Calling `imported`...");
             let result = args[0].unwrap_i32() * 2;
             println!("Result of `imported`: {:?}", result);
@@ -115,7 +115,7 @@ mod js {
                 "imported" => imported,
             }
         };
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         let exported = instance.exports.get_function("exported").unwrap();
 
@@ -169,7 +169,7 @@ mod js {
     //             "multivalue" => multivalue,
     //         }
     //     };
-    //     let instance = Instance::new(&module, &import_object).unwrap();
+    //     let instance = Instance::new(&module, import_object).unwrap();
 
     //     let exported_multivalue = instance
     //         .exports
@@ -234,11 +234,15 @@ mod js {
                 "imported" => imported,
             }
         };
-        let instance = Instance::new(&module, &import_object).unwrap();
+        std::dbg!(&import_object);
+        let instance = Instance::new(&module, import_object).unwrap();
+        std::dbg!(&instance);
 
         let exported = instance.exports.get_function("exported").unwrap();
+        std::dbg!(&exported);
 
         let expected = vec![Val::I32(9)].into_boxed_slice();
+        std::dbg!(&expected);
         assert_eq!(exported.call(&[Val::I32(3)]), Ok(expected));
     }
 
@@ -281,7 +285,7 @@ mod js {
                 "imported" => imported,
             }
         };
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         let exported = instance.exports.get_function("exported").unwrap();
 
@@ -333,7 +337,7 @@ mod js {
                 "imported" => imported,
             }
         };
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         let exported = instance.exports.get_function("exported").unwrap();
 
@@ -397,7 +401,7 @@ mod js {
                 "imported" => imported,
             }
         };
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         let memory = instance.exports.get_memory("memory").unwrap();
         assert_eq!(memory.data_size(), 65536);
@@ -504,7 +508,7 @@ mod js {
                 "imported" => imported,
             }
         };
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         let memory = instance.exports.get_memory("memory").unwrap();
         assert_eq!(memory.data_size(), 65536);
@@ -561,7 +565,7 @@ mod js {
                 "global" => global.clone()
             }
         };
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         let get_global = instance.exports.get_function("getGlobal").unwrap();
         assert_eq!(
@@ -607,7 +611,7 @@ mod js {
                 "sum" => Function::new_native(&store, sum),
             }
         };
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         let add_one: NativeFunc<i32, i32> =
             instance.exports.get_native_function("add_one").unwrap();
@@ -643,7 +647,7 @@ mod js {
                 "early_exit" => Function::new_native(&store, early_exit),
             }
         };
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         let run_func: NativeFunc<(i32, i32), i32> =
             instance.exports.get_native_function("run").unwrap();
@@ -699,7 +703,7 @@ mod js {
                 "early_exit" => Function::new_native(&store, early_exit),
             }
         };
-        let instance = Instance::new(&module, &import_object).unwrap();
+        let instance = Instance::new(&module, import_object).unwrap();
 
         fn test_result<T: core::fmt::Debug>(result: Result<T, RuntimeError>) {
             match result {
@@ -753,7 +757,7 @@ mod js {
         .unwrap();
 
         let import_object = imports! {};
-        let result = Instance::new(&module, &import_object);
+        let result = Instance::new(&module, import_object);
         let err = result.unwrap_err();
         assert!(format!("{:?}", err).contains("zero"))
     }

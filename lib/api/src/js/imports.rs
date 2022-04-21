@@ -2,11 +2,11 @@
 //! manipulate and access a wasm module's imports including memories, tables, globals, and
 //! functions.
 use crate::js::export::Export;
-use crate::js::exports::Exportable;
-use crate::js::resolver::NamedResolver;
+use crate::js::exports::{Exportable, Exports};
+use crate::js::instance::InstantiationError;
+use crate::js::module::Module;
 use crate::Extern;
-use std::borrow::{Borrow, BorrowMut};
-use std::collections::{hash_map::Entry, HashMap};
+use std::collections::HashMap;
 use std::fmt;
 
 /// All of the import data used when instantiating.
@@ -74,41 +74,47 @@ impl Imports {
     }
 
     /// TODO: Add doc
-    pub fn define(&mut self, ns: &str, name: &str, extern_: Extern) {
-        self.map.insert((ns.to_string(), name.to_string()), extern_);
+    pub fn define(&mut self, ns: &str, name: &str, val: impl Into<Extern>) {
+        self.map
+            .insert((ns.to_string(), name.to_string()), val.into());
     }
 
-    // /// Register anything that implements `LikeNamespace` as a namespace.
-    // ///
-    // /// # Usage:
-    // /// ```ignore
-    // /// # use wasmer::{Imports, Instance, Namespace};
-    // /// let mut import_object = Imports::new();
-    // ///
-    // /// import_object.register("namespace0", instance);
-    // /// import_object.register("namespace1", namespace);
-    // /// // ...
-    // /// ```
-    // pub fn register<S, N>(&mut self, name: S, namespace: N) -> Option<Box<dyn LikeNamespace>>
-    // where
-    //     S: Into<String>,
-    //     N: LikeNamespace + Send + Sync + 'static,
-    // {
-    //     let mut guard = self.map.lock().unwrap();
-    //     let map = guard.borrow_mut();
+    /// Returns the contents of a namespace as an `Exports`.
+    ///
+    /// Returns `None` if the namespace doesn't exist.
+    pub fn get_namespace_exports(&self, name: &str) -> Option<Exports> {
+        let ret: Exports = self
+            .map
+            .iter()
+            .filter(|((ns, _), _)| ns == name)
+            .map(|((_, name), e)| (name.clone(), e.clone()))
+            .collect();
+        if ret.is_empty() {
+            None
+        } else {
+            Some(ret)
+        }
+    }
 
-    //     match map.entry(name.into()) {
-    //         Entry::Vacant(empty) => {
-    //             empty.insert(Box::new(namespace));
-    //             None
-    //         }
-    //         Entry::Occupied(mut occupied) => Some(occupied.insert(Box::new(namespace))),
-    //     }
-    // }
-
-    /// asdfsa
-    pub fn resolve_by_name(&self, ns: &str, name: &str) -> Option<Export> {
-        self.get_export(ns, name)
+    /// TODO: Add doc
+    pub fn imports_for_module(&self, module: &Module) -> Result<Vec<Export>, InstantiationError> {
+        let mut ret = vec![];
+        for import in module.imports() {
+            if let Some(imp) = self
+                .map
+                .get(&(import.module().to_string(), import.name().to_string()))
+            {
+                ret.push(imp.to_export());
+            } else {
+                return Err(InstantiationError::Link(format!(
+                    "Error while importing {0:?}.{1:?}: unknown import. Expected {2:?}",
+                    import.module(),
+                    import.name(),
+                    import.ty()
+                )));
+            }
+        }
+        Ok(ret)
     }
 
     //fn iter(&self) -> impl Iterator<(&str, &str, Extern)> {
@@ -148,12 +154,6 @@ impl Imports {
 impl Into<js_sys::Object> for Imports {
     fn into(self) -> js_sys::Object {
         self.as_jsobject()
-    }
-}
-
-impl NamedResolver for Imports {
-    fn resolve_by_name(&self, ns: &str, name: &str) -> Option<Export> {
-        self.get_export(ns, name)
     }
 }
 
@@ -267,95 +267,9 @@ macro_rules! import_namespace {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::js::ChainableNamedResolver;
     use crate::js::Type;
     use crate::js::{Global, Store, Val};
     use wasm_bindgen_test::*;
-
-    #[wasm_bindgen_test]
-    fn chaining_works() {
-        let store = Store::default();
-        let g = Global::new(&store, Val::I32(0));
-
-        let imports1 = imports! {
-            "dog" => {
-                "happy" => g.clone()
-            }
-        };
-
-        let imports2 = imports! {
-            "dog" => {
-                "small" => g.clone()
-            },
-            "cat" => {
-                "small" => g.clone()
-            }
-        };
-
-        let resolver = imports1.chain_front(imports2);
-
-        let small_cat_export = resolver.resolve_by_name("cat", "small");
-        assert!(small_cat_export.is_some());
-
-        let happy = resolver.resolve_by_name("dog", "happy");
-        let small = resolver.resolve_by_name("dog", "small");
-        assert!(happy.is_some());
-        assert!(small.is_some());
-    }
-
-    #[wasm_bindgen_test]
-    fn extending_conflict_overwrites() {
-        let store = Store::default();
-        let g1 = Global::new(&store, Val::I32(0));
-        let g2 = Global::new(&store, Val::F32(0.));
-
-        let imports1 = imports! {
-            "dog" => {
-                "happy" => g1,
-            },
-        };
-
-        let imports2 = imports! {
-            "dog" => {
-                "happy" => g2,
-            },
-        };
-
-        let resolver = imports1.chain_front(imports2);
-        let happy_dog_entry = resolver.resolve_by_name("dog", "happy").unwrap();
-
-        assert!(if let Export::Global(happy_dog_global) = happy_dog_entry {
-            happy_dog_global.ty.ty == Type::F32
-        } else {
-            false
-        });
-
-        // now test it in reverse
-        let store = Store::default();
-        let g1 = Global::new(&store, Val::I32(0));
-        let g2 = Global::new(&store, Val::F32(0.));
-
-        let imports1 = imports! {
-            "dog" => {
-                "happy" => g1,
-            },
-        };
-
-        let imports2 = imports! {
-            "dog" => {
-                "happy" => g2,
-            },
-        };
-
-        let resolver = imports1.chain_back(imports2);
-        let happy_dog_entry = resolver.resolve_by_name("dog", "happy").unwrap();
-
-        assert!(if let Export::Global(happy_dog_global) = happy_dog_entry {
-            happy_dog_global.ty.ty == Type::I32
-        } else {
-            false
-        });
-    }
 
     #[wasm_bindgen_test]
     fn namespace() {
@@ -368,7 +282,7 @@ mod test {
             "dog" => namespace
         };
 
-        let happy_dog_entry = imports1.resolve_by_name("dog", "happy").unwrap();
+        let happy_dog_entry = imports1.get_export("dog", "happy").unwrap();
 
         assert!(if let Export::Global(happy_dog_global) = happy_dog_entry {
             happy_dog_global.ty.ty == Type::I32

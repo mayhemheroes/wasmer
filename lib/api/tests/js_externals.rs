@@ -379,7 +379,7 @@ mod js {
 
         let f = {
             let module = Module::new(&store, wat).unwrap();
-            let instance = Instance::new(&module, &imports! {}).unwrap();
+            let instance = Instance::new(&module, imports! {}).unwrap();
             let f = instance.exports.get_function("sum").unwrap();
 
             assert_eq!(

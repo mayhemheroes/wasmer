@@ -49,7 +49,7 @@ fn test_stdout() {
     let import_object = wasi_env.import_object(&module).unwrap();
 
     // Let's instantiate the module with the imports.
-    let instance = Instance::new(&module, &import_object).unwrap();
+    let instance = Instance::new(&module, import_object).unwrap();
 
     // Let's call the `_start` function, which is our `main` function in Rust.
     let start = instance.exports.get_function("_start").unwrap();
@@ -90,7 +90,7 @@ fn test_env() {
     let import_object = wasi_env.import_object(&module).unwrap();
 
     // Let's instantiate the module with the imports.
-    let instance = Instance::new(&module, &import_object).unwrap();
+    let instance = Instance::new(&module, import_object).unwrap();
 
     // Let's call the `_start` function, which is our `main` function in Rust.
     let start = instance.exports.get_function("_start").unwrap();
@@ -120,7 +120,7 @@ fn test_stdin() {
     let import_object = wasi_env.import_object(&module).unwrap();
 
     // Let's instantiate the module with the imports.
-    let instance = Instance::new(&module, &import_object).unwrap();
+    let instance = Instance::new(&module, import_object).unwrap();
 
     // Let's call the `_start` function, which is our `main` function in Rust.
     let start = instance.exports.get_function("_start").unwrap();
