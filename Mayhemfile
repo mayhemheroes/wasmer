@@ -1,0 +1,5 @@
+project: wasmer
+target: dylib_cranelift
+
+cmds:
+  - cmd: /dylib_cranelift
