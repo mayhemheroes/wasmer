@@ -39,6 +39,7 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        file: Dockerfile.mayhem
     - name: Start analysis
       uses: forallsecure/mcode-action@v1
       with:
