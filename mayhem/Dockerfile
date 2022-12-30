@@ -1,6 +1,10 @@
 ## Use Rust to build
 FROM rustlang/rust:nightly as builder
 
+## Install build dependencies.
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y gcc llvm
+
 ## Add source code to the build stage.
 ADD . /wasmer
 WORKDIR /wasmer
@@ -17,10 +21,6 @@ RUN cargo +nightly fuzz build universal_singlepass --features "universal singlep
 
 # Package Stage
 FROM --platform=linux/amd64 ubuntu:20.04
-
-## Install build dependencies.
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y gcc
 
 ## Copy the binary from the build stage to an Ubuntu docker image
 COPY --from=builder \
