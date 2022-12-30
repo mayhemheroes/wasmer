@@ -4,7 +4,7 @@
 use anyhow::Result;
 use libfuzzer_sys::{arbitrary, arbitrary::Arbitrary, fuzz_target};
 use wasm_smith::{Config, ConfiguredModule};
-use wasmer::{imports, CompilerConfig, EngineBuilder, Instance, Module, Store, Val};
+use wasmer::{imports, CompilerConfig, Instance, Module, Store, Val};
 #[cfg(feature = "cranelift")]
 use wasmer_compiler_cranelift::Cranelift;
 #[cfg(feature = "llvm")]
@@ -59,7 +59,7 @@ fn maybe_instantiate_singlepass(wasm_bytes: &[u8]) -> Result<Option<Instance>> {
             return Err(e.into());
         }
     };
-    let instance = Instance::new(&module, &imports! {})?;
+    let instance = Instance::new(&mut store, &module, &imports! {})?;
     Ok(Some(instance))
 }
 
@@ -70,7 +70,7 @@ fn maybe_instantiate_cranelift(wasm_bytes: &[u8]) -> Result<Option<Instance>> {
     compiler.enable_verifier();
     let mut store = Store::new(compiler);
     let module = Module::new(&store, &wasm_bytes)?;
-    let instance = Instance::new(&module, &imports! {})?;
+    let instance = Instance::new(&mut store, &module, &imports! {})?;
     Ok(Some(instance))
 }
 
@@ -81,7 +81,7 @@ fn maybe_instantiate_llvm(wasm_bytes: &[u8]) -> Result<Option<Instance>> {
     compiler.enable_verifier();
     let mut store = Store::new(compiler);
     let module = Module::new(&store, &wasm_bytes)?;
-    let instance = Instance::new(&module, &imports! {})?;
+    let instance = Instance::new(&mut store, &module, &imports! {})?;
     Ok(Some(instance))
 }
 
