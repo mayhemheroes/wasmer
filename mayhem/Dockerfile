@@ -9,7 +9,7 @@ RUN apt-get update && \
 ADD . /wasmer
 WORKDIR /wasmer
 
-RUN cargo install cargo-fuzz
+RUN cargo install cargo-fuzz llvmenv
 
 WORKDIR /wasmer/fuzz
 RUN cargo +nightly fuzz build deterministic --features "universal cranelift llvm singlepass"
