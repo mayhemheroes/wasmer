@@ -3,7 +3,7 @@ FROM rustlang/rust:nightly as builder
 
 ## Install build dependencies.
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y gcc llvm
+    DEBIAN_FRONTEND=noninteractive apt-get install -y gcc llvm cmake make clang-10
 
 ## Add source code to the build stage.
 ADD . /wasmer
