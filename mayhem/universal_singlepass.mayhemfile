@@ -1,0 +1,5 @@
+project: wasmer
+target: universal_singlepass
+
+cmds:
+  - cmd: /universal_singlepass

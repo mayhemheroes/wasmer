@@ -1,0 +1,5 @@
+project: wasmer
+target: universal_cranelift
+
+cmds:
+  - cmd: /universal_cranelift
