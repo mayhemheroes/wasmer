@@ -10,6 +10,8 @@ ADD . /wasmer
 WORKDIR /wasmer
 
 RUN cargo install cargo-fuzz llvmenv
+RUN llvmenv init && llvmenv entries && llvmenv build-entry 12.0.0
+ENV LLVM_SYS_120_PREFIX=$HOME/llvm-12.0.0
 
 WORKDIR /wasmer/fuzz
 RUN cargo +nightly fuzz build deterministic --features "universal cranelift llvm singlepass"
