@@ -19,13 +19,11 @@ RUN export LLVM_SYS_120_PREFIX=$(llvm-config-13 --prefix) && \
     cargo +nightly fuzz build universal_llvm --features "universal llvm" && \
     cargo +nightly fuzz build universal_singlepass --features "universal singlepass"
 
-# cargo build  --release --manifest-path lib/cli/Cargo.toml --features cranelift,llvm,singlepass,wasmer-artifact-create,static-artifact-create,wasmer-artifact-load,static-artifact-load --features="webc_runner" --bin wasmer
-
 # Package Stage
 FROM --platform=linux/amd64 ubuntu:20.04
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y libffi
+# Copy the libffi shared object file
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libffi.so.? /usr/lib/x86_64-linux-gnu/libffi.so.6
 
 ## Copy the binary from the build stage to an Ubuntu docker image
 COPY --from=builder \
