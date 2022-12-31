@@ -3,7 +3,7 @@ FROM rustlang/rust:nightly as builder
 
 ## Install build dependencies.
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y gcc cmake make lsb-release wget software-properties-common gnupg && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y gcc cmake make zlib1g-dev libffi-dev lsb-release wget software-properties-common gnupg && \
     wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 13 && \
     cargo install cargo-fuzz
 
@@ -26,10 +26,10 @@ FROM --platform=linux/amd64 ubuntu:20.04
 
 ## Copy the binary from the build stage to an Ubuntu docker image
 COPY --from=builder \
-        /wasmer/target/x86_64-unknown-linux-gnu/release/deterministic \
-        /wasmer/target/x86_64-unknown-linux-gnu/release/equivalence_universal \
-        /wasmer/target/x86_64-unknown-linux-gnu/release/metering \
-        /wasmer/target/x86_64-unknown-linux-gnu/release/universal_cranelift \
-        /wasmer/target/x86_64-unknown-linux-gnu/release/universal_llvm \
-        /wasmer/target/x86_64-unknown-linux-gnu/release/universal_singlepass \
-        /
+    /wasmer/target/x86_64-unknown-linux-gnu/release/deterministic \
+    /wasmer/target/x86_64-unknown-linux-gnu/release/equivalence_universal \
+    /wasmer/target/x86_64-unknown-linux-gnu/release/metering \
+    /wasmer/target/x86_64-unknown-linux-gnu/release/universal_cranelift \
+    /wasmer/target/x86_64-unknown-linux-gnu/release/universal_llvm \
+    /wasmer/target/x86_64-unknown-linux-gnu/release/universal_singlepass \
+    /
