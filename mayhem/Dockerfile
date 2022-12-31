@@ -3,7 +3,7 @@ FROM rustlang/rust:nightly as builder
 
 ## Install build dependencies.
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y gcc cmake make zlib1g-dev libffi6 libffi-dev lsb-release wget software-properties-common gnupg && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y gcc cmake make zlib1g-dev libffi-dev lsb-release wget software-properties-common gnupg && \
     wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 13 && \
     cargo install cargo-fuzz
 
@@ -23,6 +23,9 @@ RUN export LLVM_SYS_120_PREFIX=$(llvm-config-13 --prefix) && \
 
 # Package Stage
 FROM --platform=linux/amd64 ubuntu:20.04
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y libffi-dev
 
 ## Copy the binary from the build stage to an Ubuntu docker image
 COPY --from=builder \
