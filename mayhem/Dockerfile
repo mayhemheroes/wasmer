@@ -25,7 +25,7 @@ RUN export LLVM_SYS_120_PREFIX=$(llvm-config-13 --prefix) && \
 FROM --platform=linux/amd64 ubuntu:20.04
 
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y libffi-dev
+    DEBIAN_FRONTEND=noninteractive apt-get install -y libffi
 
 ## Copy the binary from the build stage to an Ubuntu docker image
 COPY --from=builder \
