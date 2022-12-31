@@ -1,0 +1,5 @@
+project: wasmer
+target: metering
+
+cmds:
+  - cmd: /metering

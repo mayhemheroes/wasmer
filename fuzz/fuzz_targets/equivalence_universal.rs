@@ -4,7 +4,7 @@
 use anyhow::Result;
 use libfuzzer_sys::{arbitrary, arbitrary::Arbitrary, fuzz_target};
 use wasm_smith::{Config, ConfiguredModule};
-use wasmer::{imports, CompilerConfig, EngineBuilder, Instance, Module, Store, Val};
+use wasmer::{imports, CompilerConfig, Instance, Module, Store, Value};
 #[cfg(feature = "cranelift")]
 use wasmer_compiler_cranelift::Cranelift;
 #[cfg(feature = "llvm")]
@@ -45,7 +45,7 @@ impl std::fmt::Debug for WasmSmithModule {
 }
 
 #[cfg(feature = "singlepass")]
-fn maybe_instantiate_singlepass(wasm_bytes: &[u8]) -> Result<Option<Instance>> {
+fn maybe_instantiate_singlepass(wasm_bytes: &[u8]) -> Result<Option<(Instance, Store)>> {
     let compiler = Singlepass::default();
     let mut store = Store::new(compiler);
     let module = Module::new(&store, &wasm_bytes);
@@ -59,36 +59,36 @@ fn maybe_instantiate_singlepass(wasm_bytes: &[u8]) -> Result<Option<Instance>> {
             return Err(e.into());
         }
     };
-    let instance = Instance::new(&module, &imports! {})?;
-    Ok(Some(instance))
+    let instance = Instance::new(&mut store, &module, &imports! {})?;
+    Ok(Some((instance, store)))
 }
 
 #[cfg(feature = "cranelift")]
-fn maybe_instantiate_cranelift(wasm_bytes: &[u8]) -> Result<Option<Instance>> {
+fn maybe_instantiate_cranelift(wasm_bytes: &[u8]) -> Result<Option<(Instance, Store)>> {
     let mut compiler = Cranelift::default();
     compiler.canonicalize_nans(true);
     compiler.enable_verifier();
     let mut store = Store::new(compiler);
     let module = Module::new(&store, &wasm_bytes)?;
-    let instance = Instance::new(&module, &imports! {})?;
-    Ok(Some(instance))
+    let instance = Instance::new(&mut store, &module, &imports! {})?;
+    Ok(Some((instance, store)))
 }
 
 #[cfg(feature = "llvm")]
-fn maybe_instantiate_llvm(wasm_bytes: &[u8]) -> Result<Option<Instance>> {
+fn maybe_instantiate_llvm(wasm_bytes: &[u8]) -> Result<Option<(Instance, Store)>> {
     let mut compiler = LLVM::default();
     compiler.canonicalize_nans(true);
     compiler.enable_verifier();
     let mut store = Store::new(compiler);
     let module = Module::new(&store, &wasm_bytes)?;
-    let instance = Instance::new(&module, &imports! {})?;
-    Ok(Some(instance))
+    let instance = Instance::new(&mut store, &module, &imports! {})?;
+    Ok(Some((instance, store)))
 }
 
 #[derive(Debug)]
 enum FunctionResult {
     Error(String),
-    Values(Vec<Val>),
+    Values(Vec<Value>),
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -121,8 +121,8 @@ impl PartialEq for FunctionResult {
                         .iter()
                         .zip(other_values.iter())
                         .all(|(x, y)| match (x, y) {
-                            (Val::F32(x), Val::F32(y)) => x.to_bits() == y.to_bits(),
-                            (Val::F64(x), Val::F64(y)) => x.to_bits() == y.to_bits(),
+                            (Value::F32(x), Value::F32(y)) => x.to_bits() == y.to_bits(),
+                            (Value::F64(x), Value::F64(y)) => x.to_bits() == y.to_bits(),
                             _ => x == y,
                         })
             }
@@ -133,8 +133,8 @@ impl PartialEq for FunctionResult {
 
 impl Eq for FunctionResult {}
 
-fn evaluate_instance(instance: Result<Instance>) -> InstanceResult {
-    if let Err(_err) = instance {
+fn evaluate_instance(instance_and_store: Result<(Instance, Store)>) -> InstanceResult {
+    if let Err(_err) = instance_and_store {
         /*let mut error_message = format!("{}", err);
         // Remove the stack trace.
         if error_message.starts_with("RuntimeError: unreachable\n") {
@@ -143,13 +143,13 @@ fn evaluate_instance(instance: Result<Instance>) -> InstanceResult {
         InstanceResult::Error(error_message)*/
         InstanceResult::Error("".into())
     } else {
-        let instance = instance.unwrap();
+        let (instance, mut store) = instance_and_store.unwrap();
         let mut results = vec![];
         for it in instance.exports.iter().functions() {
             let (_, f) = it;
             // TODO: support functions which take params.
-            if f.ty().params().is_empty() {
-                let result = f.call(&[]);
+            if f.ty(&mut store).params().is_empty() {
+                let result = f.call(&mut store, &[]);
                 let result = if let Ok(values) = result {
                     FunctionResult::Values(values.into())
                 } else {
