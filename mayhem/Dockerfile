@@ -3,7 +3,7 @@ FROM rustlang/rust:nightly as builder
 
 ## Install build dependencies.
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y gcc cmake make zlib1g-dev libffi-dev lsb-release wget software-properties-common gnupg && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y gcc cmake make zlib1g-dev libffi6 libffi-dev lsb-release wget software-properties-common gnupg && \
     wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 13 && \
     cargo install cargo-fuzz
 
