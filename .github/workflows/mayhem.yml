@@ -41,7 +41,7 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         file: Dockerfile.mayhem
     - name: Start analysis
-      uses: forallsecure/mcode-action@v1
+      uses: forallsecure/mcode-action@long-runs
       with:
         mayhem-token: ${{ secrets.MAYHEM_TOKEN }}
         args: --image ${{ steps.meta.outputs.tags }} --duration 300
