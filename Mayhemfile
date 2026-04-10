@@ -1,5 +1,5 @@
 project: wasmer
-target: dylib_cranelift
+target: universal_cranelift
 
 cmds:
-  - cmd: /dylib_cranelift
+  - cmd: /universal_cranelift
